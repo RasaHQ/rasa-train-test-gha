@@ -1,0 +1,252 @@
+name: 'Rasa Test & Train'
+description: 'The GitHub action to run the rasa train and rasa test commands'
+inputs:
+  rasa_version:
+    description: 'The Rasa version used to run test and train'
+    required: true
+    default: 'latest-full'
+  rasa_image:
+    description: 'Custom Docker image'
+    required: false
+    default: ''
+  rasa_train:
+    description: 'Run the rasa train'
+    required: true
+    default: 'true'
+  rasa_test:
+    description: 'Run the rasa test'
+    required: true
+    default: 'true'
+  data_validate:
+    description: 'Validates domain and data files to check for possible mistakes'
+    required: true
+    default: 'true'
+  workspace:
+    description: 'The root directory'
+    required: false
+    default: '${{ github.workspace }}'
+  train_args:
+    description: 'Additional arguments passed to the rasa train command'
+    required: false
+    default: ''
+  test_args:
+    description: 'Additional arguments passed to the rasa test command'
+    required: false
+    default: ''
+  test_type:
+    description: 'The types of tests to run (available types: core/nlu/all)'
+    required: true
+    default: 'all'
+  publish_summary:
+    description: 'Publish tests summary as a PR comment'
+    required: false
+    default: 'true'
+  github_token:
+    description: 'GitHub Token - required to add a comment with summary'
+    required: false
+    default: ''
+  configuration:
+    description: 'Model configuration file'
+    required: true
+    default: 'config.yml'
+  model:
+    description: 'Path to a file with a model. Use existing model instead of training a new one'
+    required: false
+    default: ''
+  cross_validation:
+    description: 'Switch on cross validation mode. Any provided model will be ignored'
+    required: false
+    default: 'false'
+  configuration_name:
+    description: 'Configuration name used in summary. If not provided a file name is used'
+    required: false
+    default: ''
+  data_name:
+    description: 'Data name used in summary. If not provided a directory name is used'
+    required: false
+    default: 'default'
+  compare_report:
+    description: 'Path to a report that will be used to compare results'
+    required: false
+    default: ''
+outputs:
+  report:
+    description: "Return report as JSON"
+    value: ${{ steps.report_output.outputs.report }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set environment
+      shell: bash
+      run: |-
+        mkdir -p ${{ inputs.workspace }}/models
+        chmod 777 ${{ inputs.workspace }}/models
+        mkdir -p ${{ inputs.workspace }}/results
+        chmod 777 ${{ inputs.workspace }}/results
+
+        case "${{ inputs.test_type }}" in
+          all)
+            echo TEST_TYPE="" >> $GITHUB_ENV
+            ;;
+          nlu)
+            echo TEST_TYPE=nlu >> $GITHUB_ENV
+            echo DEFAULT_ARGS="--config /app/${{ inputs.configuration }}" >> $GITHUB_ENV
+            ;;
+          core)
+            echo TEST_TYPE=core >> $GITHUB_ENV
+            ;;
+          *)
+            echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
+            exit 1
+        esac
+
+        # Set a model path
+        if [[ -n "${{ inputs.model }}" ]];then
+          echo MODEL_ARGS="--model /app/${{ inputs.model }}" >> $GITHUB_ENV
+        fi
+
+        # Set cross validation
+        if [[ "${{ inputs.cross_validation }}" == "true" ]];then
+          echo CROSS_VALIDATION_ARGS="--cross-validation" >> $GITHUB_ENV
+        fi
+
+        # Set docker args
+        echo DOCKER_ARGS="--rm --tmpfs /.config -e MPLCONFIGDIR=/tmp/.mplconfigdir \
+          -e CI=${CI} -v ${{ github.workspace }}:/app/github_workspace -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
+          -v ${{ inputs.workspace }}/results:/app/results" >> $GITHUB_ENV
+
+        # Set environment variables for generating a report
+        echo "SUMMARY_FILE=${{ inputs.workspace }}/reports/report.json" >> $GITHUB_ENV
+
+        if [[ -n "${{ inputs.configuration_name }}" ]]; then
+          echo "CONFIG=${{ inputs.configuration_name }}" >> $GITHUB_ENV
+        else
+          echo "CONFIG=${{ inputs.configuration }}" >> $GITHUB_ENV
+        fi
+
+        echo "DATASET_NAME=${{ inputs.data_name }}" >> $GITHUB_ENV
+        echo "RESULT_DIR=${{ inputs.workspace }}/results" >> $GITHUB_ENV
+
+    - name: Set the Rasa version
+      shell: bash
+      run: |
+        DOCKERHUB_TAGS_URL="https://registry.hub.docker.com/v2/repositories/rasa/rasa/tags?page_size=10000"
+        # Get the latest version
+        if [[ "${{ inputs.rasa_version }}" == "latest-full" ]]; then
+          LATEST_RASA_VERSION=$(curl -s ${DOCKERHUB_TAGS_URL} | jq -r '.results[].name' | grep -E 'full' | grep -vE 'latest' | sort -Vr | head -n1)
+          echo "RASA_VERSION=${LATEST_RASA_VERSION}" >> $GITHUB_ENV
+        else
+          # Validate Rasa version
+          CHECK_VERSION=$(curl --silent ${DOCKERHUB_TAGS_URL} | jq -r '.results[] | select(.name=="${{ inputs.rasa_version }}") | .name')
+          if [[ "$CHECK_VERSION" != "${{ inputs.rasa_version }}" ]]; then
+            echo "::error::Rasa in ${{ inputs.rasa_version }} version doesn't exist. Check if the given Rasa version is valid, https://hub.docker.com/r/rasa/rasa/tags" && exit 1
+          fi
+          echo "RASA_VERSION=${{ inputs.rasa_version }}" >> $GITHUB_ENV
+        fi
+
+    - name: Set the Rasa image
+      shell: bash
+      run: |
+        if [[ -z "${{ inputs.rasa_image }}" ]]; then
+          echo "RASA_IMAGE=rasa/rasa:${{ env.RASA_VERSION }}" >> $GITHUB_ENV
+        else
+          echo "RASA_IMAGE=${{ inputs.rasa_image }}" >> $GITHUB_ENV
+        fi
+
+    - name: Data Validation
+      shell: bash
+      run: |
+        if [[ "${{ inputs.data_validate }}" == "true" ]]; then
+          echo "Run data validation"
+          echo
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate
+        else
+          echo "::warning::Data validation is disabled. In order to turn on data validation set the data_validate parameter to 'true'."
+        fi
+
+    - name: Run the rasa train command
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.model }}" ]]; then
+          echo
+          echo "Use model ${{ inputs.model }}. Skipping training"
+          echo
+        elif [[ "${{ inputs.rasa_train }}" == "true" ]]; then
+          echo "Run the rasa train"
+          echo ""
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TEST_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ inputs.train_args }}
+        else
+          echo "::warning::The rasa train is disabled. In order to turn on the rasa train set the rasa_train parameter to 'true'."
+        fi
+
+    - name: Run the test command
+      shell: bash
+      run: |
+        if [[ "${{ inputs.rasa_test }}" == "true" ]]; then
+          echo "Run the rasa test"
+          echo ""
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test ${{ env.TEST_TYPE }} ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_args }}
+        else
+          echo "::warning::The rasa train is disabled. In order to turn on the rasa train set the rasa_train parameter to 'true'."
+        fi
+
+    - name: Generate a report
+      id: report_output
+      shell: bash
+      run: |
+        mkdir -p ${{ inputs.workspace }}/reports
+        python3 ${{ github.action_path }}/scripts/generate_results_report.py
+
+        # Copy a report from the current one if the report to compare wasn't provided
+        cp ${{ inputs.workspace }}/reports/report.json ${{ inputs.workspace }}/reports/report_master.json
+
+        if [[ -n "${{ inputs.compare_report }}" && -e "${{ inputs.compare_report }}" ]]; then
+          cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/reports/report_master.json
+        else
+          echo "::warning::The report ${{ inputs.compare_report }} to compare doesn't exist."
+        fi
+
+        echo "::set-output name=report::$(docker run --rm -v ${{ github.action_path }}/templates:/templates \
+          -v ${{ inputs.workspace }}/reports/report.json:/report.json hairyhenderson/gomplate -d report=/report.json \
+          -f /templates/report_to_json.tmpl)"
+
+        # Convert JSON to CSV
+        python3 ${{ github.action_path }}/scripts/json_to_csv.py ${{ inputs.workspace }}/reports/report.json ${{ inputs.workspace }}/reports/report.csv
+
+    - name: Publish summary as a comment in a PR
+      shell: bash
+      run: |
+        if [[ -z "${{ inputs.github_token }}" && "${{ inputs.publish_summary }}" == "true" && "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "::warning::The GITHUB_TOKEN is required. Set the 'github_token' input parameter in order to publish summary."
+        elif [[ "${{ inputs.publish_summary }}" == "true" && "${{ github.event_name }}" == "pull_request" ]]; then
+          docker run --rm  \
+            -v ${{ github.action_path }}/templates:/templates \
+            -v ${{ inputs.workspace }}/reports:/reports hairyhenderson/gomplate -d data=/reports/report.json -d results_master=/reports/report_master.json \
+            -f /templates/comment_summary.tmpl > comment_summary.md
+
+          OUTPUT=$(cat comment_summary.md)
+
+          if [[ "${{ inputs.cross_validation }}" == "true" ]]; then
+            pip3 install pytablewriter
+            OUTPUT="${OUTPUT}\n$(python3 ${{ github.action_path }}/scripts/cross_validation_results.py)"
+          fi
+
+          OUTPUT="${OUTPUT//$'\n'/'\n'}"
+
+          curl -X POST -s -H "Authorization: token ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json"  \
+          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments -d "{\"body\":\"Commit: ${{ github.sha }}\n$OUTPUT\"}"
+
+        elif [[ "${{ github.event_name }}" != "pull_request" ]]; then
+          echo
+          echo "::warning::Publishing summary as a comment in a PR is available only for a pull request."
+          echo
+        else
+          echo
+          echo "Publishing summary as a comment in a PR is disabled. In order to enabled it set the 'publish_summary' input parameter to 'true'."
+          echo
+        fi
+
+    - name: Clean
+      shell: bash
+      run: |
+        rm -rf ${{ inputs.workspace }}/reports/report_master.json
