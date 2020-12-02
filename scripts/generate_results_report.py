@@ -1,5 +1,4 @@
-# Collect the results of the various model test runs which are done as part of
-# The model regression CI pipeline and dump them as a single file artifact.This artifact will the then be published at the end of the tests.
+# Collect the results of the various model test runs
 import json
 import os
 

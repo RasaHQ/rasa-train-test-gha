@@ -9,12 +9,15 @@ on:
   pull_request:
 
 jobs:
+  # Test the GH action on Rasa X Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
   test_action_x:
     runs-on: ubuntu-latest
     name: Test GH action - Rasa X Demo
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Checkout Rasa X Demo
       uses: actions/checkout@v2
       with:
@@ -44,9 +47,18 @@ jobs:
       run: |
         echo ${{ fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy }}
 
+    - name: Checkout output - if
+      if: fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy <= 0.5
+      run: |
+        echo "::error::${{ fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy }}"
+        exit 1
+
+  # Test the GH action on Rasa Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
+  # Test type: NLU
   test_action:
     runs-on: ubuntu-latest
-    name: Test GH action - Rasa Demo - nlu
+    name: Test GH action - Rasa Demo - NLU
     needs: [test_action_x]
 
     steps:
@@ -71,12 +83,18 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        test_args: '-f 3'
+        # Use cross validation
         cross_validation: 'true'
+        # Compare results to the test report
         compare_report: .github/test_files/report_to_compare.json
 
-  test_action_origin:
+  # Test the GH action on Rasa Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
+  # Test type: ALL
+  test_action_all:
     runs-on: ubuntu-latest
-    name: Test GH action - Rasa Demo - all
+    name: Test GH action - Rasa Demo - ALL
 
     steps:
     - uses: actions/checkout@v2
@@ -96,6 +114,6 @@ jobs:
       uses: ./
       with:
         rasa_version: '2.0.0-full'
-        configuration_name: 'Rasa Demo - ALL'
+        configuration_name: 'Rasa Demo'
         workspace: ${{ github.workspace }}/rasa-demo
         github_token: ${{ secrets.GITHUB_TOKEN }}
