@@ -20,11 +20,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: RasaHQ/rasa-demo
-        path: rasa-demo
 
     - name: Use test configuration
       run: |
-        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+        cp .github/test_files/config_rasa_demo.yml config.yml
 
     - id: action
       name: Rasa Test & Train - Rasa Demo
@@ -32,13 +31,12 @@ jobs:
       with:
         rasa_version: '2.0.0-full'
         configuration_name: 'Rasa Demo - Configuration 1'
-        workspace: ${{ github.workspace }}/rasa-demo
         publish_summary: 'false'
 
     - uses: actions/upload-artifact@v2
       with:
         name: rasa-demo-cfg-1
-        path: rasa-demo/reports
+        path: reports
 
   test_action_2:
     runs-on: ubuntu-latest
@@ -51,11 +49,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: RasaHQ/rasa-demo
-        path: rasa-demo
 
     - name: Use test configuration
       run: |
-        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+        cp .github/test_files/config_rasa_demo.yml config.yml
 
     - id: action
       name: Rasa Test & Train - Rasa Demo
@@ -63,13 +60,12 @@ jobs:
       with:
         rasa_version: '2.0.0-full'
         configuration_name: 'Rasa Demo - Configuration 2'
-        workspace: ${{ github.workspace }}/rasa-demo
         publish_summary: 'false'
 
     - uses: actions/upload-artifact@v2
       with:
         name: rasa-demo-cfg-2
-        path: rasa-demo/reports
+        path: reports
 
   test_action_publish_summary:
     runs-on: ubuntu-latest
@@ -90,12 +86,12 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: rasa-demo-cfg-1
-        path: rasa-demo/
 
     - uses: actions/download-artifact@v2
       with:
         name: rasa-demo-cfg-2
-        path: rasa-demo/
+
+    - run: ls -la
 
     - id: action
       name: Rasa Test & Train - Rasa Demo

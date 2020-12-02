@@ -202,7 +202,7 @@ runs:
 
         if [[ -n "${{ inputs.compare_report }}" && -e "${{ inputs.compare_report }}" ]]; then
           cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/reports/report_master.json
-        else
+        elif [[ -n "${{ inputs.compare_report }}" && ! -e "${{ inputs.compare_report }}" ]]; then
           echo "::warning::The report ${{ inputs.compare_report }} to compare doesn't exist."
         fi
 
