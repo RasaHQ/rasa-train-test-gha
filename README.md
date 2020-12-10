@@ -115,7 +115,7 @@ jobs:
 
 ### Compare results with the base report
 
-It possible to compare results to the other report. The difference against the report that we compare to is included in brackets.
+It possible to compare results to the other report, the feature is useful for example to see that a model is better than before changes. The difference against the report that we compare to is included in brackets.
 
 ```yaml
 jobs:
