@@ -1,6 +1,6 @@
 {
     "default": {
-      "config.yml": {
+      "Rasa Demo - NLU": {
         "entity_prediction": {
           "macro_avg": {
             "f1-score": 0.2378897757789324,
