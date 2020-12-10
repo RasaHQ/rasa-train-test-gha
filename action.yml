@@ -150,17 +150,17 @@ runs:
         # Get the latest version
         if [[ "${{ inputs.rasa_version }}" == "latest-full" ]]; then
           LATEST_RASA_VERSION=$(curl -s ${DOCKERHUB_TAGS_URL} | jq -r '.results[].name' | grep -E 'full' | grep -vE 'latest' | sort -Vr | head -n1)
-          echo "RASA_VERSION=${LATEST_RASA_VERSION}" >> $GITHUB_ENV
+          RASA_VERSION=${LATEST_RASA_VERSION}
         else
           # Validate Rasa version
           CHECK_VERSION=$(curl --silent ${DOCKERHUB_TAGS_URL} | jq -r '.results[] | select(.name=="${{ inputs.rasa_version }}") | .name')
           if [[ "$CHECK_VERSION" != "${{ inputs.rasa_version }}" ]]; then
             echo "::error::Rasa in ${{ inputs.rasa_version }} version doesn't exist. Check if the given Rasa version is valid, https://hub.docker.com/r/rasa/rasa/tags" && exit 1
           fi
-          echo "RASA_VERSION=${{ inputs.rasa_version }}" >> $GITHUB_ENV
+          RASA_VERSION=${{ inputs.rasa_version }}
         fi
 
-        echo "RASA_IMAGE=rasa/rasa:${{ env.RASA_VERSION }}" >> $GITHUB_ENV
+        echo "RASA_IMAGE=rasa/rasa:${RASA_VERSION}" >> $GITHUB_ENV
 
     - name: Data Validation
       shell: bash
