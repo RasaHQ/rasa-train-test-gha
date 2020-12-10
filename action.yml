@@ -69,6 +69,14 @@ inputs:
     description: 'Path to a report that will be used to compare results'
     required: false
     default: ''
+  result_directory:
+    description: 'Directory name where results are stored in'
+    required: false
+    default: 'results'
+  report_directory:
+    description: 'Directory name where reports are stored in'
+    required: false
+    default: 'reports'
 outputs:
   report:
     description: "Return report as JSON"
@@ -81,8 +89,8 @@ runs:
       run: |-
         mkdir -p ${{ inputs.workspace }}/models
         chmod 777 ${{ inputs.workspace }}/models
-        mkdir -p ${{ inputs.workspace }}/results
-        chmod 777 ${{ inputs.workspace }}/results
+        mkdir -p ${{ inputs.workspace }}/${{ inputs.result_directory }}
+        chmod 777 ${{ inputs.workspace }}/${{ inputs.result_directory }}
 
         case "${{ inputs.test_type }}" in
           all)
@@ -114,7 +122,7 @@ runs:
         echo DOCKER_ARGS="--rm --tmpfs /.config -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
-          -v ${{ inputs.workspace }}/results:/app/results" >> $GITHUB_ENV
+          -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
 
         # Set environment variables for generating a report
         echo "SUMMARY_FILE=${{ inputs.workspace }}/reports/report.json" >> $GITHUB_ENV
@@ -126,11 +134,18 @@ runs:
         fi
 
         echo "DATASET_NAME=${{ inputs.data_name }}" >> $GITHUB_ENV
-        echo "RESULT_DIR=${{ inputs.workspace }}/results" >> $GITHUB_ENV
+        echo "RESULT_DIR=${{ inputs.workspace }}/${{ inputs.result_directory }}" >> $GITHUB_ENV
 
-    - name: Set the Rasa version
+    - name: Set the Rasa version and image
       shell: bash
       run: |
+        # Set custom rasa image
+        if [[ -n "${{ inputs.rasa_image }}" ]]; then
+          echo "RASA_IMAGE=${{ inputs.rasa_image }}" >> $GITHUB_ENV
+          # Don't continue if a custom rasa image was used
+          exit 0
+        fi
+
         DOCKERHUB_TAGS_URL="https://registry.hub.docker.com/v2/repositories/rasa/rasa/tags?page_size=10000"
         # Get the latest version
         if [[ "${{ inputs.rasa_version }}" == "latest-full" ]]; then
@@ -145,14 +160,7 @@ runs:
           echo "RASA_VERSION=${{ inputs.rasa_version }}" >> $GITHUB_ENV
         fi
 
-    - name: Set the Rasa image
-      shell: bash
-      run: |
-        if [[ -z "${{ inputs.rasa_image }}" ]]; then
-          echo "RASA_IMAGE=rasa/rasa:${{ env.RASA_VERSION }}" >> $GITHUB_ENV
-        else
-          echo "RASA_IMAGE=${{ inputs.rasa_image }}" >> $GITHUB_ENV
-        fi
+        echo "RASA_IMAGE=rasa/rasa:${{ env.RASA_VERSION }}" >> $GITHUB_ENV
 
     - name: Data Validation
       shell: bash
@@ -195,24 +203,24 @@ runs:
       id: report_output
       shell: bash
       run: |
-        mkdir -p ${{ inputs.workspace }}/reports
+        mkdir -p ${{ inputs.workspace }}/${{ inputs.report_directory }}
         python3 ${{ github.action_path }}/scripts/generate_results_report.py
 
         # Copy a report from the current one if the report to compare to wasn't provided
-        cp ${{ inputs.workspace }}/reports/report.json ${{ inputs.workspace }}/reports/report_master.json
+        cp ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json
 
         if [[ -n "${{ inputs.compare_report }}" && -e "${{ inputs.compare_report }}" ]]; then
-          cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/reports/report_master.json
+          cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json
         elif [[ -n "${{ inputs.compare_report }}" && ! -e "${{ inputs.compare_report }}" ]]; then
           echo "::warning::The report ${{ inputs.compare_report }} to compare doesn't exist."
         fi
 
         echo "::set-output name=report::$(docker run --rm -v ${{ github.action_path }}/templates:/templates \
-          -v ${{ inputs.workspace }}/reports/report.json:/report.json hairyhenderson/gomplate -d report=/report.json \
+          -v ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json:/report.json hairyhenderson/gomplate -d report=/report.json \
           -f /templates/report_to_json.tmpl)"
 
         # Convert JSON to CSV
-        python3 ${{ github.action_path }}/scripts/json_to_csv.py ${{ inputs.workspace }}/reports/report.json ${{ inputs.workspace }}/reports/report.csv
+        python3 ${{ github.action_path }}/scripts/json_to_csv.py ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.csv
 
     - name: Publish summary as a comment in a PR
       shell: bash
@@ -222,7 +230,7 @@ runs:
         elif [[ "${{ inputs.publish_summary }}" == "true" && "${{ github.event_name }}" == "pull_request" ]]; then
           docker run --rm  \
             -v ${{ github.action_path }}/templates:/templates \
-            -v ${{ inputs.workspace }}/reports:/reports hairyhenderson/gomplate -d data=/reports/report.json -d results_master=/reports/report_master.json \
+            -v ${{ inputs.workspace }}/${{ inputs.report_directory }}:/reports hairyhenderson/gomplate -d data=/reports/report.json -d results_master=/reports/report_master.json \
             -f /templates/comment_summary.tmpl > comment_summary.md
 
           OUTPUT=$(cat comment_summary.md)
@@ -250,4 +258,4 @@ runs:
     - name: Clean
       shell: bash
       run: |
-        rm -rf ${{ inputs.workspace }}/reports/report_master.json
+        rm -rf ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json

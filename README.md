@@ -10,6 +10,11 @@ In order to pass the input parameters to the GH action, you have to use the [`wi
 jobs:
   my_first_job:
     steps:
+      # Checks-out GitHub repository
+      # more: https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+
+      # Run rasa train and rasa test
       - name: My first step
         uses: RasaHQ/rasa-train-test-gha@master
         with:
@@ -18,15 +23,15 @@ jobs:
 
 |        Input         |                                  Description                                  |          Default          |
 | -------------------- | ----------------------------------------------------------------------------- | ------------------------- |
-| `rasa_version`       | The Rasa Open Source version used to run test and train                      | `latest-full`             |
-| `rasa_image`         | Custom Rasa Docker image. Useful if you use Rasa with custom Python modules.                                                          | `none`                    |
-| `rasa_train`         | Run `rasa train`                                                           | `true`                    |
-| `rasa_test`          | Run `rasa test`                                                             | `true`                    |
+| `rasa_version`       | The Rasa Open Source version used to run test and train                       | `latest-full`             |
+| `rasa_image`         | Custom Rasa Docker image. Useful if you use Rasa with custom Python modules.  | `none`                    |
+| `rasa_train`         | Run `rasa train`                                                              | `true`                    |
+| `rasa_test`          | Run `rasa test`                                                               | `true`                    |
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
-| `workspace`          | The root directory containing your Rasa Open Source project                                                            | `${{ github.workspace }}` |
-| `train_args`         | Additional arguments passed to the `rasa train` command                         | `none`                    |
-| `test_args`          | Additional arguments passed to the `rasa test` command                          | `none`                    |
-| `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)                     | `all`                     |
+| `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
+| `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
+| `test_args`          | Additional arguments passed to the `rasa test` command                        | `none`                    |
+| `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)               | `all`                     |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |
 | `github_token`       | GitHub Token - required to add a comment with summary                         | `none`                    |
 | `configuration`      | Model configuration file                                                      | `config.yml`              |
@@ -35,6 +40,8 @@ jobs:
 | `configuration_name` | Configuration name used in summary. If not provided a file name is used       | `none`                    |
 | `data_name`          | Data name used in summary. If not provided a directory name is used           | `default`                 |
 | `compare_report`     | Path to a report that will be used to compare results                         | `none`                    |
+| `result_directory`   | Directory name where results are stored in                                    | `results`                 |
+| `report_directory`   | Directory name where reports are stored in                                    | `reports`                 |
 
 ## Outputs
 
@@ -63,6 +70,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
             # ...
 ```
@@ -87,6 +96,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
 
             # We have to convert the output to JSON by using fromJSON built-in function
@@ -117,6 +128,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 # A path to the report that we want to compare to
                 compare_report: 'report_to_compare.json'
@@ -146,6 +159,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 # If a file with the model is provided, training is disabled automatically
                 model: test_model.tar.gz
@@ -165,6 +180,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 # Switch on cross validation mode. Any provided model will be ignored
                 cross_validation: 'true'
@@ -195,6 +212,8 @@ jobs:
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
 
             # The 'actions/upload-artifact' action to upload files
