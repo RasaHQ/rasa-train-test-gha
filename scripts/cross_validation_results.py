@@ -14,12 +14,10 @@ def intent_table():
     cols = ["support", "f1-score", "confused_with"]
     writer.headers = ["class"] + cols
 
+    data.pop("accuracy", None)
     classes = list(data.keys())
-    try:
-        classes.remove("accuracy")
-    except:
-        pass
-    classes.sort(key=lambda x: data[x]["support"], reverse=True)
+   
+    classes.sort(key=lambda x: data[x].get("support", 0), reverse=True)
 
     def format_cell(data, c, k):
         if not data[c].get(k):

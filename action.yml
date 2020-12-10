@@ -188,7 +188,7 @@ runs:
           echo ""
           docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test ${{ env.TEST_TYPE }} ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_args }}
         else
-          echo "::warning::The rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
+          echo "::warning::rasa test is disabled. To turn on the rasa train set the rasa_test parameter to 'true'."
         fi
 
     - name: Generate a report
