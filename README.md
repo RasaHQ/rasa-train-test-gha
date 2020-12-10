@@ -18,7 +18,7 @@ jobs:
 
 |        Input         |                                  Description                                  |          Default          |
 | -------------------- | ----------------------------------------------------------------------------- | ------------------------- |
-| `rasa_version`       | The Rasa version used to run test and train                                   | `latest-full`             |
+| `rasa_version`       | The Rasa Open Source version used to run test and train                      | `latest-full`             |
 | `rasa_image`         | Custom Docker image                                                           | `none`                    |
 | `rasa_train`         | Run `rasa train`                                                           | `true`                    |
 | `rasa_test`          | Run `rasa test`                                                             | `true`                    |
