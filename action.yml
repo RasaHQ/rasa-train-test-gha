@@ -168,6 +168,7 @@ runs:
         if [[ "${{ inputs.data_validate }}" == "true" ]]; then
           echo "Run data validation"
           echo
+          echo docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate
           docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate
         else
           echo "::warning::Data validation is disabled. To turn on data validation set the data_validate parameter to 'true'."
