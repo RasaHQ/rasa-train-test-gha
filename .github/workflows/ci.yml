@@ -1,4 +1,3 @@
-
 name: Continuous Integration
 on:
   push:
@@ -83,7 +82,7 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        test_args: '-f 3'
+        test_args: '-f 2'
         # Use cross validation
         cross_validation: 'true'
         # Compare results to the test report

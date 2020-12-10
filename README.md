@@ -2,9 +2,9 @@
 
 The GitHub action to run easily `rasa train` and `rasa test` in the CIs.
 
-## Input arguments
+## Input Arguments
 
-In order to pass the input parameters to the GH action, you have to use the [`with`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepswith) argument in a step that uses the GH action, e.g.
+In order to pass the input parameters to the GH action, you have to use the [`with`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepswith) argument in a step that uses the GH action, e.g.:
 
 ```yaml
 jobs:
