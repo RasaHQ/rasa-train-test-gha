@@ -20,13 +20,13 @@ jobs:
 | -------------------- | ----------------------------------------------------------------------------- | ------------------------- |
 | `rasa_version`       | The Rasa version used to run test and train                                   | `latest-full`             |
 | `rasa_image`         | Custom Docker image                                                           | `none`                    |
-| `rasa_train`         | Run the rasa train                                                            | `true`                    |
-| `rasa_test`          | Run the rasa test                                                             | `true`                    |
+| `rasa_train`         | Run `rasa train`                                                           | `true`                    |
+| `rasa_test`          | Run `rasa test`                                                             | `true`                    |
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
-| `workspace`          | The root directory                                                            | `${{ github.workspace }}` |
-| `train_args`         | Additional arguments passed to the rasa train command                         | `none`                    |
-| `test_args`          | Additional arguments passed to the rasa test command                          | `none`                    |
-| `test_type`          | The types of tests to run (available types: core/nlu/all)                     | `all`                     |
+| `workspace`          | The root directory containing your Rasa Open Source project                                                            | `${{ github.workspace }}` |
+| `train_args`         | Additional arguments passed to the `rasa train` command                         | `none`                    |
+| `test_args`          | Additional arguments passed to the `rasa test` command                          | `none`                    |
+| `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)                     | `all`                     |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |
 | `github_token`       | GitHub Token - required to add a comment with summary                         | `none`                    |
 | `configuration`      | Model configuration file                                                      | `config.yml`              |
