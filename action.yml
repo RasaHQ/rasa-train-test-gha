@@ -10,11 +10,11 @@ inputs:
     required: false
     default: ''
   rasa_train:
-    description: 'Run the rasa train'
+    description: 'Run rasa train'
     required: true
     default: 'true'
   rasa_test:
-    description: 'Run the rasa test'
+    description: 'Run rasa test'
     required: true
     default: 'true'
   data_validate:
@@ -177,7 +177,7 @@ runs:
           echo ""
           docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TEST_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ inputs.train_args }}
         else
-          echo "::warning::The rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
+          echo "::warning::rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
         fi
 
     - name: Run the test command

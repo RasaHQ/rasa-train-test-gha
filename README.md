@@ -19,7 +19,7 @@ jobs:
 |        Input         |                                  Description                                  |          Default          |
 | -------------------- | ----------------------------------------------------------------------------- | ------------------------- |
 | `rasa_version`       | The Rasa Open Source version used to run test and train                      | `latest-full`             |
-| `rasa_image`         | Custom Docker image                                                           | `none`                    |
+| `rasa_image`         | Custom Rasa Docker image. Useful if you use Rasa with custom Python modules.                                                          | `none`                    |
 | `rasa_train`         | Run `rasa train`                                                           | `true`                    |
 | `rasa_test`          | Run `rasa test`                                                             | `true`                    |
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
