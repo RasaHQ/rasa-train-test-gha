@@ -25,7 +25,7 @@ if sys.argv[1] is not None and sys.argv[2] is not None:
     fileOutput = sys.argv[2]
     inputFile = Path(fileInput)
 
-    dataJSON = json.load(inputFile.read_text())
+    dataJSON = json.loads(inputFile.read_text())
     data = flattenjson(dataJSON, "__")
     inputFile.close()
 
