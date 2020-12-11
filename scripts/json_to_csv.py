@@ -1,4 +1,5 @@
 import csv, json, sys
+from pathlib import Path
 
 def flattenjson(b, delim):
     val = {}
@@ -22,9 +23,9 @@ header = [
 if sys.argv[1] is not None and sys.argv[2] is not None:
     fileInput = sys.argv[1]
     fileOutput = sys.argv[2]
-    inputFile = open(fileInput)
+    inputFile = Path(fileInput)
 
-    dataJSON = json.load(inputFile)
+    dataJSON = json.load(inputFile.read_text())
     data = flattenjson(dataJSON, "__")
     inputFile.close()
 

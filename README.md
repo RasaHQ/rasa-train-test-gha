@@ -9,6 +9,8 @@ In order to pass the input parameters to the GH action, you have to use the [`wi
 ```yaml
 jobs:
   my_first_job:
+    name: My first job
+    runs-on: ubuntu-latest
     steps:
       # Checks-out GitHub repository
       # more: https://github.com/actions/checkout
