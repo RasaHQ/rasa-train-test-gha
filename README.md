@@ -61,7 +61,7 @@ In the example below, we are using [the Rasa Demo data](https://github.com/RasaH
 
 ```yaml
 jobs:
-    tran_and_test:
+    train_and_test:
         # ...
         steps:
             # ...
@@ -86,7 +86,7 @@ The GH action returns a JSON report as an output. The following example shows ho
 
 ```yaml
 jobs:
-    tran_and_test:
+    train_and_test:
         # ...
         steps:
             # ...
@@ -119,7 +119,7 @@ It possible to compare results to the other report, the feature is useful for ex
 
 ```yaml
 jobs:
-    tran_and_test:
+    train_and_test:
         # ...
         steps:
             # ...
@@ -171,7 +171,7 @@ jobs:
 
 ```yaml
 jobs:
-    tran_and_test:
+    train_and_test:
         # ...
         steps:
             # ...
@@ -202,7 +202,7 @@ In a case where the cross-validation mode is enabled, a summary published as a P
 
 ```yaml
 jobs:
-    tran_and_test:
+    train_and_test:
         # ...
         steps:
             # ...
