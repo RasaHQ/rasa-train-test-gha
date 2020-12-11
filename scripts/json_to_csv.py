@@ -27,7 +27,6 @@ if sys.argv[1] is not None and sys.argv[2] is not None:
 
     dataJSON = json.loads(inputFile.read_text())
     data = flattenjson(dataJSON, "__")
-    inputFile.close()
 
     with open(fileOutput, "w") as file:
         csv_file = csv.writer(file)
