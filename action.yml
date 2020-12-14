@@ -81,6 +81,11 @@ outputs:
   report:
     description: "Return report as JSON"
     value: ${{ steps.report_output.outputs.report }}
+
+branding:
+  icon: 'layers'
+  color: 'green'
+
 runs:
   using: "composite"
   steps:
