@@ -1,0 +1,41 @@
+name: Release
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get release version
+        id: release_version
+        run: |
+          sed -e 's/_version_/'${GITHUB_REF#refs/tags/}'/g' package.json.tmp > package.json
+          echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+
+      - name: Changelog
+        uses: scottbrenner/generate-changelog-action@1.0.1
+        id: changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_version.outputs.version }}
+          release_name: ${{ steps.release_version.outputs.version }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
