@@ -1,4 +1,4 @@
-# Rasa Train and Test GitHub Action
+# Rasa Train-Test Model GitHub Action
 
 The GitHub action to run easily `rasa train` and `rasa test` in the CIs.
 

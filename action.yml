@@ -1,4 +1,4 @@
-name: 'Rasa Test & Train'
+name: 'Rasa Train-Test Model GitHub Action'
 description: 'The GitHub action to run the rasa train and rasa test commands'
 inputs:
   rasa_version:
