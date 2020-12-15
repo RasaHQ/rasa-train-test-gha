@@ -1,0 +1,161 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - '*'
+  pull_request:
+
+env:
+  RASA_X_DEMO_VERSION: '0.33.0'
+  RASA_IMAGE_TAG: '2.1.3-full'
+
+jobs:
+  test_action_init:
+    runs-on: ubuntu-latest
+    name: Test GH action - rasa init
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create a new project
+      run: |
+        mkdir rasa-project
+        chmod 777 rasa-project
+        docker run --rm -v ${{ github.workspace }}/rasa-project:/rasa-project rasa/rasa:${{ env.RASA_IMAGE_TAG }} init --no-prompt --init-dir /rasa-project
+
+    - name: Download Rasa X model
+      run: |
+        wget https://github.com/RasaHQ/rasa-x-demo/blob/0.33.0/models/model.tar.gz?raw=true \
+          -O test_model.tar.gz
+
+    - id: action
+      name: Rasa Test & Train - rasa init
+      uses: ./
+      with:
+        rasa_version: ${{ env.RASA_IMAGE_TAG }}
+        workspace: ${{ github.workspace }}/rasa-project
+        test_type: all
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        configuration_name: 'rasa-init'
+        publish_summary: 'false'
+
+    - name: Checkout output
+      run: |
+        echo ${{ fromJSON(steps.action.outputs.report).default['rasa-init'].intent_classification.accuracy }}
+
+    - name: Checkout output - if
+      if: fromJSON(steps.action.outputs.report).default['rasa-init'].intent_classification.accuracy <= 0.5
+      run: |
+        echo "::error::${{ fromJSON(steps.action.outputs.report).default['rasa-init'].intent_classification.accuracy }}"
+        exit 1
+
+  # Test the GH action on Rasa X Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
+  test_action_x:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa X Demo
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa X Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-x-demo
+        path: rasa-x-demo
+        ref: ${{ env.RASA_X_DEMO_VERSION }}
+
+    - name: Download Rasa X model
+      run: |
+        wget https://github.com/RasaHQ/rasa-x-demo/blob/0.33.0/models/model.tar.gz?raw=true \
+          -O test_model.tar.gz
+
+    - id: action
+      name: Rasa Test & Train - Rasa X Demo
+      uses: ./
+      with:
+        rasa_version: '2.0.0-full'
+        workspace: ${{ github.workspace }}/rasa-x-demo
+        test_type: all
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        model: github_workspace/test_model.tar.gz
+        configuration: github_workspace/test_files/config_rasa_x_demo.yml
+        configuration_name: 'Rasa X Demo'
+        publish_summary: 'false'
+
+    - name: Checkout output
+      run: |
+        echo ${{ fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy }}
+
+    - name: Checkout output - if
+      if: fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy <= 0.5
+      run: |
+        echo "::error::${{ fromJSON(steps.action.outputs.report).default['Rasa X Demo'].intent_classification.accuracy }}"
+        exit 1
+
+  # Test the GH action on Rasa Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
+  # Test type: NLU
+  test_action:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa Demo - NLU
+    needs: [test_action_x]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-demo
+        path: rasa-demo
+
+    - name: Use test configuration
+      run: |
+        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+
+    - id: action
+      name: Rasa Test & Train - Rasa Demo
+      uses: ./
+      with:
+        rasa_version: '2.0.0-full'
+        configuration_name: 'Rasa Demo - NLU'
+        workspace: ${{ github.workspace }}/rasa-demo
+        test_type: nlu
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        test_args: '-f 2'
+        # Use cross validation
+        cross_validation: 'true'
+        # Compare results to the test report
+        compare_report: .github/test_files/report_to_compare.json
+
+  # Test the GH action on Rasa Demo data
+  # https://github.com/RasaHQ/rasa-x-demo
+  # Test type: ALL
+  test_action_all:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa Demo - ALL
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-demo
+        path: rasa-demo
+
+    - name: Use test configuration
+      run: |
+        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+
+    - id: action
+      name: Rasa Test & Train - Rasa Demo
+      uses: ./
+      with:
+        rasa_version: '2.0.0-full'
+        configuration_name: 'Rasa Demo'
+        workspace: ${{ github.workspace }}/rasa-demo
+        github_token: ${{ secrets.GITHUB_TOKEN }}

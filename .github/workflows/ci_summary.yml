@@ -1,0 +1,79 @@
+name: Continuous Integration - Test summary
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - '*'
+  pull_request:
+
+jobs:
+  test_action_1:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa Demo - cfg 1
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-demo
+        path: rasa-demo
+
+    - name: Use test configuration
+      run: |
+        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+
+    - id: action
+      name: Rasa Test & Train - Rasa Demo
+      uses: ./
+      with:
+        rasa_version: '2.0.0-full'
+        configuration_name: 'Rasa Demo - Configuration 1'
+        workspace: ${{ github.workspace }}/rasa-demo
+        publish_summary: 'false'
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: rasa-demo-cfg-1
+        path: rasa-demo/reports
+
+  test_action_2:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa Demo - cfg 2
+    needs: [test_action_1]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-demo
+        path: rasa-demo
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: rasa-demo-cfg-1
+        path: rasa-demo/reports
+
+    - name: Use test configuration
+      run: |
+        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+
+    - id: action
+      name: Rasa Test & Train - Rasa Demo
+      uses: ./
+      with:
+        rasa_version: '2.0.0-full'
+        configuration_name: 'Rasa Demo - Configuration 2'
+        workspace: ${{ github.workspace }}/rasa-demo
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: rasa-demo-cfg-2
+        path: |
+          rasa-demo/results
+          rasa-demo/reports
