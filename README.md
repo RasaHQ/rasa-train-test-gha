@@ -18,7 +18,7 @@ jobs:
 
       # Run rasa train and rasa test
       - name: My first step
-        uses: RasaHQ/rasa-train-test-gha@master
+        uses: RasaHQ/rasa-train-test-gha@main
         with:
           test_type: nlu
 ```
@@ -68,7 +68,7 @@ jobs:
         steps:
             # ...
             - name: Train and Test Rasa Demo
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
@@ -94,7 +94,7 @@ jobs:
             # ...
             - name: Train and Test Rasa Demo
               id: action
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
@@ -126,7 +126,7 @@ jobs:
         steps:
             # ...
             - name: Train and Test Rasa Demo
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
@@ -157,7 +157,7 @@ jobs:
                   -O test_model.tar.gz
 
             - name: Train and Test Rasa Demo
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
@@ -178,7 +178,7 @@ jobs:
         steps:
             # ...
             - name: Train and Test Rasa Demo
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
@@ -210,7 +210,7 @@ jobs:
             # ...
             - name: Train and Test Rasa Demo
               id: action
-              uses: RasaHQ/rasa-train-test-gha@master
+              uses: RasaHQ/rasa-train-test-gha@main
               with:
                 # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
                 rasa_version: '2.0.0-full'
