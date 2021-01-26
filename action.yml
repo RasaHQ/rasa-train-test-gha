@@ -213,10 +213,10 @@ runs:
         python3 ${{ github.action_path }}/scripts/generate_results_report.py
 
         # Copy a report from the current one if the report to compare to wasn't provided
-        cp ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json
+        cp ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_main.json
 
         if [[ -n "${{ inputs.compare_report }}" && -e "${{ inputs.compare_report }}" ]]; then
-          cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json
+          cp ${{ inputs.compare_report }} ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_main.json
         elif [[ -n "${{ inputs.compare_report }}" && ! -e "${{ inputs.compare_report }}" ]]; then
           echo "::warning::The report ${{ inputs.compare_report }} to compare doesn't exist."
         fi
@@ -236,7 +236,7 @@ runs:
         elif [[ "${{ inputs.publish_summary }}" == "true" && "${{ github.event_name }}" == "pull_request" ]]; then
           docker run --rm  \
             -v ${{ github.action_path }}/templates:/templates \
-            -v ${{ inputs.workspace }}/${{ inputs.report_directory }}:/reports hairyhenderson/gomplate -d data=/reports/report.json -d results_master=/reports/report_master.json \
+            -v ${{ inputs.workspace }}/${{ inputs.report_directory }}:/reports hairyhenderson/gomplate -d data=/reports/report.json -d results_main=/reports/report_main.json \
             -f /templates/comment_summary.tmpl > comment_summary.md
 
           OUTPUT=$(cat comment_summary.md)
@@ -264,4 +264,4 @@ runs:
     - name: Clean
       shell: bash
       run: |
-        rm -rf ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_master.json
+        rm -rf ${{ inputs.workspace }}/${{ inputs.report_directory }}/report_main.json
