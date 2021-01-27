@@ -2,7 +2,7 @@ name: Continuous Integration - Test summary
 on:
   push:
     branches:
-    - master
+    - main
     tags:
     - '*'
   pull_request:
