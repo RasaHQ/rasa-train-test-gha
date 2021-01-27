@@ -84,6 +84,7 @@ jobs:
         configuration: github_workspace/test_files/config_rasa_x_demo.yml
         configuration_name: 'Rasa X Demo'
         publish_summary: 'false'
+        data_validate: 'false'
 
     - name: Checkout output
       run: |
