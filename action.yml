@@ -158,8 +158,8 @@ runs:
           RASA_VERSION=${LATEST_RASA_VERSION}
         else
           # Validate Rasa version
-          CHECK_VERSION=$(curl --silent ${DOCKERHUB_TAGS_URL} | jq -r '.results[] | select(.name=="${{ inputs.rasa_version }}") | .name')
-          if [[ "$CHECK_VERSION" != "${{ inputs.rasa_version }}" ]]; then
+          CHECK_VERSION=$((DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect rasa/rasa:${{ inputs.rasa_version }} &> /dev/null && echo true || echo false) || true)
+          if [[ "$CHECK_VERSION" != "true" ]]; then
             echo "::error::Rasa version ${{ inputs.rasa_version }} doesn't exist. Check if the given Rasa version is valid, https://hub.docker.com/r/rasa/rasa/tags" && exit 1
           fi
           RASA_VERSION=${{ inputs.rasa_version }}
