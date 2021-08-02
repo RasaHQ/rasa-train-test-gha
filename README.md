@@ -30,6 +30,7 @@ jobs:
 | `rasa_train`         | Run `rasa train`                                                              | `true`                    |
 | `rasa_test`          | Run `rasa test`                                                               | `true`                    |
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
+| `fine_tune`          | Fine-tune an existing model with new training dataset                         | `false`                   |
 | `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
 | `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
 | `test_args`          | Additional arguments passed to the `rasa test` command                        | `none`                    |
@@ -167,6 +168,32 @@ jobs:
                 # If a file with the model is provided, training is disabled automatically
                 model: test_model.tar.gz
             # ...
+```
+
+### Fine-tune the existing model
+
+You can fine-tune an existing model with new training dataset. Please see [incremental training](https://rasa.com/docs/rasa/command-line-interface#incremental-training) for more details.
+
+```yaml
+jobs:
+    train_and_test:
+        # ...
+        steps:
+            # ...
+            - name: Train and Test Rasa Demo
+              uses: RasaHQ/rasa-train-test-gha@main
+              with:
+                # List of available tags: https://hub.docker.com/r/rasa/rasa/tags
+                rasa_version: '2.0.0-full'
+                # In order to add a PR comment with summary
+                # a GH Token has to be pass to the GH action
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                # By default, the number of epoches is defined in model configuration
+                # You can shorten the epoches by using the --epoch-fraction flag
+                fine_tune: 'true'
+                train_args: >-
+                  --epoch-fraction 0.5
+                # ...
 ```
 
 ### Cross-validate NLU model
