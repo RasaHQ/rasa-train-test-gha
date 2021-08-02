@@ -161,6 +161,5 @@ jobs:
       with:
         rasa_version: '2.0.0-full'
         configuration_name: 'Rasa Demo'
-        fine_tune: true
         workspace: ${{ github.workspace }}/rasa-demo
         github_token: ${{ secrets.GITHUB_TOKEN }}

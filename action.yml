@@ -188,10 +188,9 @@ runs:
       run: |
         if [[ "${{ inputs.fine_tune }}" == "true" ]]; then
           echo "Fine tuning model is enabled."
-          echo $FINE_TUNE="--finetune" >> $GITHUB_ENV
+          echo FINE_TUNE="--finetune" >> $GITHUB_ENV
         else
           echo "::warning::Fine tune is disabled. To turn on fine-tune, set the fine_tune parameter to 'true'."
-          echo $FINE_TUNE="" >> $GITHUB_ENV
         fi
 
     - name: Run the rasa train command
