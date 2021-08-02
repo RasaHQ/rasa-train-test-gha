@@ -119,11 +119,16 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
+        rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - NLU'
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
@@ -154,11 +159,16 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
+        rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo'
         workspace: ${{ github.workspace }}/rasa-demo
         github_token: ${{ secrets.GITHUB_TOKEN }}
