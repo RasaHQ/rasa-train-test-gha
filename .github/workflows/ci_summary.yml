@@ -36,6 +36,7 @@ jobs:
       with:
         rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - Configuration 1'
+        test_core_args: '--stories rasa-demo/tests/test_conversations.yml'
         workspace: ${{ github.workspace }}/rasa-demo
         publish_summary: 'false'
 
@@ -78,6 +79,7 @@ jobs:
       with:
         rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - Configuration 2'
+        test_core_args: '--stories rasa-demo/tests/test_conversations.yml'
         workspace: ${{ github.workspace }}/rasa-demo
         github_token: ${{ secrets.GITHUB_TOKEN }}
 

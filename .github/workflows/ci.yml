@@ -99,9 +99,9 @@ jobs:
         exit 1
 
   # Test the GH action on Rasa Demo data
-  # https://github.com/RasaHQ/rasa-x-demo
+  # https://github.com/RasaHQ/rasa-demo
   # Test type: NLU
-  test_action:
+  test_action_nlu:
     runs-on: ubuntu-latest
     name: Test GH action - Rasa Demo - NLU
     needs: [test_action_x]
@@ -133,18 +133,19 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        test_args: '-f 2'
+        test_nlu_args: '-f 3'
+        config: 'config_nlu_testing.yml'
         # Use cross validation
         cross_validation: 'true'
         # Compare results to the test report
         compare_report: .github/test_files/report_to_compare.json
 
   # Test the GH action on Rasa Demo data
-  # https://github.com/RasaHQ/rasa-x-demo
-  # Test type: ALL
-  test_action_all:
+  # https://github.com/RasaHQ/rasa-demo
+  # Test type: Core
+  test_action_core:
     runs-on: ubuntu-latest
-    name: Test GH action - Rasa Demo - ALL
+    name: Test GH action - Rasa Demo - Core
 
     steps:
     - uses: actions/checkout@v2
@@ -169,6 +170,43 @@ jobs:
       uses: ./
       with:
         rasa_version: ${{ env.RASA_VERSION }}-full
-        configuration_name: 'Rasa Demo'
+        configuration_name: 'Rasa Demo - Core'
         workspace: ${{ github.workspace }}/rasa-demo
+        test_type: 'core'
+        test_core_args: '--stories rasa-demo/tests/test_conversations.yml'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Test the GH action on Rasa Demo data
+  # https://github.com/RasaHQ/rasa-demo
+  # Test type: all
+  test_action_all:
+    runs-on: ubuntu-latest
+    name: Test GH action - Rasa Demo - All
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout Rasa Demo
+      uses: actions/checkout@v2
+      with:
+        repository: RasaHQ/rasa-demo
+        path: rasa-demo
+
+    - name: Use test configuration
+      run: |
+        cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
+
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
+    - id: action
+      name: Rasa Test & Train - Rasa Demo
+      uses: ./
+      with:
+        rasa_version: ${{ env.RASA_VERSION }}-full
+        configuration_name: 'Rasa Demo - All'
+        workspace: ${{ github.workspace }}/rasa-demo
+        test_core_args: '--stories rasa-demo/tests/test_conversations.yml'
         github_token: ${{ secrets.GITHUB_TOKEN }}
