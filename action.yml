@@ -37,8 +37,12 @@ inputs:
     description: 'Additional arguments passed to the rasa train command'
     required: false
     default: ''
-  test_args:
-    description: 'Additional arguments passed to the rasa test command'
+  test_nlu_args:
+    description: 'Additional arguments passed to the rasa test nlu command'
+    required: false
+    default: ''
+  test_core_args:
+    description: 'Additional arguments passed to the rasa test core command'
     required: false
     default: ''
   test_type:
@@ -123,14 +127,15 @@ runs:
 
         case "${{ inputs.test_type }}" in
           all)
-            echo TEST_TYPE="" >> $GITHUB_ENV
+            echo TEST_NLU="true" >> $GITHUB_ENV
+            echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
           nlu)
-            echo TEST_TYPE=nlu >> $GITHUB_ENV
+            echo TEST_NLU="true" >> $GITHUB_ENV
             echo DEFAULT_ARGS="--config /app/${{ inputs.configuration }}" >> $GITHUB_ENV
             ;;
           core)
-            echo TEST_TYPE=core >> $GITHUB_ENV
+            echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
           *)
             echo "::error::Unknown tests type: ${{ inputs.test_type }} (use: core/nlu/all)"
@@ -234,7 +239,12 @@ runs:
         if [[ "${{ inputs.rasa_test }}" == "true" ]]; then
           echo "Run the rasa test"
           echo ""
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test ${{ env.TEST_TYPE }} ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_args }}
+          if [[ "${{ env.TEST_NLU }}" == "true" ]]; then
+            docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test nlu ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_nlu_args }}
+          fi
+          if [[ "${{ env.TEST_CORE }}" == "true" ]]; then
+            docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test core ${{ env.MODEL_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_core_args }}
+          fi
         else
           echo "::warning::rasa test is disabled. To turn on the rasa train set the rasa_test parameter to 'true'."
         fi

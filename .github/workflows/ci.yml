@@ -133,7 +133,7 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        test_args: '-f 2'
+        test_nlu_args: '-f 2'
         # Use cross validation
         cross_validation: 'true'
         # Compare results to the test report
@@ -172,7 +172,7 @@ jobs:
         configuration_name: 'Rasa Demo - CORE'
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: core
-        test_args: >-
+        test_core_args: >-
           --stories tests/test_conversations.yml
           --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}

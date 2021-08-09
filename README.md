@@ -32,10 +32,11 @@ jobs:
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
 | `fine_tune`          | Fine-tune an existing model with new training dataset                         | `false`                   |
 | `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
-| `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
 | `train_type`         | The types of training (available types: `core`/`nlu`/`all`)                   | `all`                     |
-| `test_args`          | Additional arguments passed to the `rasa test` command                        | `none`                    |
+| `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
 | `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)               | `all`                     |
+| `test_nlu_args`      | Additional arguments passed to the `rasa test nlu` command                    | `none`                    |
+| `test_core_args`     | Additional arguments passed to the `rasa test core` command                   | `none`                    |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |
 | `github_token`       | GitHub Token - required to add a comment with summary                         | `none`                    |
 | `configuration`      | Model configuration file                                                      | `config.yml`              |
@@ -217,7 +218,7 @@ jobs:
                 cross_validation: 'true'
                 # Number of cross validation folds (cross validation only)
                 # All available arguments: rasa test nlu --help
-                test_args: '--folds 3'
+                test_nlu_args: '--folds 3'
                 test_type: 'nlu'
             # ...
 ```
