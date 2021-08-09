@@ -141,10 +141,10 @@ jobs:
 
   # Test the GH action on Rasa Demo data
   # https://github.com/RasaHQ/rasa-x-demo
-  # Test type: ALL
-  test_action_all:
+  # Test type: CORE
+  test_action_core:
     runs-on: ubuntu-latest
-    name: Test GH action - Rasa Demo - ALL
+    name: Test GH action - Rasa Demo - CORE
 
     steps:
     - uses: actions/checkout@v2
@@ -169,6 +169,10 @@ jobs:
       uses: ./
       with:
         rasa_version: ${{ env.RASA_VERSION }}-full
-        configuration_name: 'Rasa Demo'
+        configuration_name: 'Rasa Demo - CORE'
         workspace: ${{ github.workspace }}/rasa-demo
+        test_type: core
+        test_args: >-
+          --stories tests/test_conversations.yml
+          --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}
