@@ -33,6 +33,7 @@ jobs:
 | `fine_tune`          | Fine-tune an existing model with new training dataset                         | `false`                   |
 | `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
 | `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
+| `train_type`         | The types of training (available types: `core`/`nlu`/`all`)                   | `all`                     |
 | `test_args`          | Additional arguments passed to the `rasa test` command                        | `none`                    |
 | `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)               | `all`                     |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |

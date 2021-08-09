@@ -29,6 +29,10 @@ inputs:
     description: 'The root directory'
     required: false
     default: '${{ github.workspace }}'
+  train_type:
+    description: 'The types of training (available types: core/nlu/all)'
+    required: false
+    default: 'all'
   train_args:
     description: 'Additional arguments passed to the rasa train command'
     required: false
@@ -101,6 +105,22 @@ runs:
         mkdir -p ${{ inputs.workspace }}/${{ inputs.result_directory }}
         chmod 777 ${{ inputs.workspace }}/${{ inputs.result_directory }}
 
+        case "${{ inputs.train_type }}" in
+          all)
+            echo TRAIN_TYPE="" >> $GITHUB_ENV
+            ;;
+          nlu)
+            echo TRAIN_TYPE=nlu >> $GITHUB_ENV
+            echo DEFAULT_ARGS="--config /app/${{ inputs.configuration }}" >> $GITHUB_ENV
+            ;;
+          core)
+            echo TRAIN_TYPE=core >> $GITHUB_ENV
+            ;;
+          *)
+            echo "::error::Unknown training type: ${{ inputs.train_type }} (use: core/nlu/all)"
+            exit 1
+        esac
+
         case "${{ inputs.test_type }}" in
           all)
             echo TEST_TYPE="" >> $GITHUB_ENV
@@ -113,7 +133,7 @@ runs:
             echo TEST_TYPE=core >> $GITHUB_ENV
             ;;
           *)
-            echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
+            echo "::error::Unknown tests type: ${{ inputs.test_type }} (use: core/nlu/all)"
             exit 1
         esac
 
@@ -203,7 +223,7 @@ runs:
         elif [[ "${{ inputs.rasa_train }}" == "true" ]]; then
           echo "Run the rasa train"
           echo ""
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TEST_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ env.FINE_TUNE }} ${{ inputs.train_args }}
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TRAIN_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ env.FINE_TUNE }} ${{ inputs.train_args }}
         else
           echo "::warning::rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
         fi
