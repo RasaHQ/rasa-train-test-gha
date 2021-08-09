@@ -141,10 +141,10 @@ jobs:
 
   # Test the GH action on Rasa Demo data
   # https://github.com/RasaHQ/rasa-x-demo
-  # Test type: CORE
-  test_action_core:
+  # Test type: ALL
+  test_action_all:
     runs-on: ubuntu-latest
-    name: Test GH action - Rasa Demo - CORE
+    name: Test GH action - Rasa Demo - ALL
 
     steps:
     - uses: actions/checkout@v2
@@ -169,9 +169,9 @@ jobs:
       uses: ./
       with:
         rasa_version: ${{ env.RASA_VERSION }}-full
-        configuration_name: 'Rasa Demo - CORE'
+        configuration_name: 'Rasa Demo - ALL'
         workspace: ${{ github.workspace }}/rasa-demo
-        test_type: core
+        test_type: all
         # The arguments algin with the CI in rasa-demo
         # https://github.com/RasaHQ/rasa-demo/blob/main/.github/workflows/continuous_integration.yml#L199-L207
         test_core_args: >-
