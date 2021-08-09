@@ -138,7 +138,7 @@ runs:
             echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
           *)
-            echo "::error::Unknown tests type: ${{ inputs.test_type }} (use: core/nlu/all)"
+            echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
             exit 1
         esac
 
