@@ -17,6 +17,10 @@ inputs:
     description: 'Run rasa test'
     required: true
     default: 'true'
+  fine_tune:
+    description: 'Fine-tune model'
+    required: false
+    default: 'false'
   data_validate:
     description: 'Validates domain and data files to check for possible mistakes'
     required: true
@@ -25,12 +29,20 @@ inputs:
     description: 'The root directory'
     required: false
     default: '${{ github.workspace }}'
+  train_type:
+    description: 'The types of training (available types: core/nlu/all)'
+    required: false
+    default: 'all'
   train_args:
     description: 'Additional arguments passed to the rasa train command'
     required: false
     default: ''
-  test_args:
-    description: 'Additional arguments passed to the rasa test command'
+  test_nlu_args:
+    description: 'Additional arguments passed to the rasa test nlu command'
+    required: false
+    default: ''
+  test_core_args:
+    description: 'Additional arguments passed to the rasa test core command'
     required: false
     default: ''
   test_type:
@@ -97,16 +109,33 @@ runs:
         mkdir -p ${{ inputs.workspace }}/${{ inputs.result_directory }}
         chmod 777 ${{ inputs.workspace }}/${{ inputs.result_directory }}
 
-        case "${{ inputs.test_type }}" in
+        case "${{ inputs.train_type }}" in
           all)
-            echo TEST_TYPE="" >> $GITHUB_ENV
+            echo TRAIN_TYPE="" >> $GITHUB_ENV
             ;;
           nlu)
-            echo TEST_TYPE=nlu >> $GITHUB_ENV
+            echo TRAIN_TYPE=nlu >> $GITHUB_ENV
             echo DEFAULT_ARGS="--config /app/${{ inputs.configuration }}" >> $GITHUB_ENV
             ;;
           core)
-            echo TEST_TYPE=core >> $GITHUB_ENV
+            echo TRAIN_TYPE=core >> $GITHUB_ENV
+            ;;
+          *)
+            echo "::error::Unknown training type: ${{ inputs.train_type }} (use: core/nlu/all)"
+            exit 1
+        esac
+
+        case "${{ inputs.test_type }}" in
+          all)
+            echo TEST_NLU="true" >> $GITHUB_ENV
+            echo TEST_CORE="true" >> $GITHUB_ENV
+            ;;
+          nlu)
+            echo TEST_NLU="true" >> $GITHUB_ENV
+            echo DEFAULT_ARGS="--config /app/${{ inputs.configuration }}" >> $GITHUB_ENV
+            ;;
+          core)
+            echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
           *)
             echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
@@ -179,6 +208,16 @@ runs:
           echo "::warning::Data validation is disabled. To turn on data validation set the data_validate parameter to 'true'."
         fi
 
+    - name: Fine Tune
+      shell: bash
+      run: |
+        if [[ "${{ inputs.fine_tune }}" == "true" ]]; then
+          echo "Fine tuning model is enabled."
+          echo FINE_TUNE="--finetune" >> $GITHUB_ENV
+        else
+          echo "::warning::Fine tune is disabled. To turn on fine-tune, set the fine_tune parameter to 'true'."
+        fi
+
     - name: Run the rasa train command
       shell: bash
       run: |
@@ -189,7 +228,7 @@ runs:
         elif [[ "${{ inputs.rasa_train }}" == "true" ]]; then
           echo "Run the rasa train"
           echo ""
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TEST_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ inputs.train_args }}
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TRAIN_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ env.FINE_TUNE }} ${{ inputs.train_args }}
         else
           echo "::warning::rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
         fi
@@ -200,7 +239,12 @@ runs:
         if [[ "${{ inputs.rasa_test }}" == "true" ]]; then
           echo "Run the rasa test"
           echo ""
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test ${{ env.TEST_TYPE }} ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_args }}
+          if [[ "${{ env.TEST_NLU }}" == "true" ]]; then
+            docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test nlu ${{ env.MODEL_ARGS }} ${{ env.CROSS_VALIDATION_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_nlu_args }}
+          fi
+          if [[ "${{ env.TEST_CORE }}" == "true" ]]; then
+            docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} test core ${{ env.MODEL_ARGS }} ${{ env.DEFAULT_ARGS }} ${{ inputs.test_core_args }}
+          fi
         else
           echo "::warning::rasa test is disabled. To turn on the rasa train set the rasa_test parameter to 'true'."
         fi

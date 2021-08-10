@@ -37,6 +37,7 @@ jobs:
         rasa_version: ${{ env.RASA_IMAGE_TAG }}
         workspace: ${{ github.workspace }}/rasa-project
         test_type: all
+        fine_tune: 'true'
         github_token: ${{ secrets.GITHUB_TOKEN }}
         configuration_name: 'rasa-init'
         publish_summary: 'false'
@@ -79,6 +80,7 @@ jobs:
         rasa_version: ${{ env.RASA_IMAGE_TAG }}
         workspace: ${{ github.workspace }}/rasa-x-demo
         test_type: all
+        fine_tune: 'true'
         github_token: ${{ secrets.GITHUB_TOKEN }}
         model: github_workspace/test_model.tar.gz
         configuration: github_workspace/test_files/config_rasa_x_demo.yml
@@ -117,16 +119,21 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
+        rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - NLU'
         workspace: ${{ github.workspace }}/rasa-demo
         test_type: nlu
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        test_args: '-f 2'
+        test_nlu_args: '-f 2'
         # Use cross validation
         cross_validation: 'true'
         # Compare results to the test report
@@ -152,11 +159,23 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
-        configuration_name: 'Rasa Demo'
+        rasa_version: ${{ env.RASA_VERSION }}-full
+        configuration_name: 'Rasa Demo - ALL'
         workspace: ${{ github.workspace }}/rasa-demo
+        test_type: all
+        # The arguments algin with the CI in rasa-demo
+        # https://github.com/RasaHQ/rasa-demo/blob/main/.github/workflows/continuous_integration.yml#L199-L207
+        test_core_args: >-
+          --stories tests/test_conversations.yml
+          --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}
+

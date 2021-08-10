@@ -25,13 +25,21 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
+        rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - Configuration 1'
         workspace: ${{ github.workspace }}/rasa-demo
+        test_core_args: >-
+          --stories tests/test_conversations.yml
+          --fail-on-prediction-errors
         publish_summary: 'false'
 
     - uses: actions/upload-artifact@v2
@@ -62,13 +70,21 @@ jobs:
       run: |
         cp .github/test_files/config_rasa_demo.yml rasa-demo/config.yml
 
+    - name: Set Rasa Version
+      run: |
+        RASA_VERSION=$(sed -ne 's/^rasa==\(.*\)#.*$/\1/p' rasa-demo/requirements.txt)
+        echo RASA_VERSION=$RASA_VERSION >> $GITHUB_ENV
+
     - id: action
       name: Rasa Test & Train - Rasa Demo
       uses: ./
       with:
-        rasa_version: '2.0.0-full'
+        rasa_version: ${{ env.RASA_VERSION }}-full
         configuration_name: 'Rasa Demo - Configuration 2'
         workspace: ${{ github.workspace }}/rasa-demo
+        test_core_args: >-
+          --stories tests/test_conversations.yml
+          --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/upload-artifact@v2
