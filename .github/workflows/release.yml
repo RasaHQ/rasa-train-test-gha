@@ -22,7 +22,7 @@ jobs:
           echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
 
       - name: Changelog
-        uses: scottbrenner/generate-changelog-action@1.0.1
+        uses: scottbrenner/generate-changelog-action@v1.3.3
         id: changelog
         env:
           REPO: ${{ github.repository }}
