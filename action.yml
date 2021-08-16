@@ -89,6 +89,10 @@ inputs:
     description: 'Directory name where reports are stored in'
     required: false
     default: 'reports'
+  gomplate_image:
+    description: 'Custom gomplate image. Useful if you use custom gomplate image'
+    required: false
+    default: 'hairyhenderson/gomplate'
 outputs:
   report:
     description: "Return report as JSON"
@@ -266,7 +270,7 @@ runs:
         fi
 
         echo "::set-output name=report::$(docker run --rm -v ${{ github.action_path }}/templates:/templates \
-          -v ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json:/report.json hairyhenderson/gomplate -d report=/report.json \
+          -v ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json:/report.json ${{ inputs.gomplate_image }} -d report=/report.json \
           -f /templates/report_to_json.tmpl)"
 
         # Convert JSON to CSV
