@@ -48,6 +48,7 @@ jobs:
 | `result_directory`   | Directory name where results are stored in                                    | `results`                 |
 | `report_directory`   | Directory name where reports are stored in                                    | `reports`                 |
 | `gomplate_image`     | Custom gomplate image. Useful if you use custom gomplate image                | `hairyhenderson/gomplate` |
+| `tmpfs_directory`    | The directory location where tmpfs mounts                                     | `/.config`                |
 
 ## Outputs
 

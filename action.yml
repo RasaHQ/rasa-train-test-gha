@@ -93,6 +93,10 @@ inputs:
     description: 'Custom gomplate image. Useful if you use custom gomplate image'
     required: false
     default: 'hairyhenderson/gomplate'
+  tmpfs_directory:
+    description: 'The directory location where tmpfs mounts'
+    required: false
+    default: '/.config'
 outputs:
   report:
     description: "Return report as JSON"
@@ -157,7 +161,7 @@ runs:
         fi
 
         # Set docker args
-        echo DOCKER_ARGS="--rm --tmpfs /.config -e MPLCONFIGDIR=/tmp/.mplconfigdir \
+        echo DOCKER_ARGS="--rm --tmpfs ${{ inputs.tmpfs_directory }} -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
           -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
