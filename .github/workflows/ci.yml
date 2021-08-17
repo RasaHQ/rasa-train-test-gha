@@ -176,6 +176,5 @@ jobs:
         # https://github.com/RasaHQ/rasa-demo/blob/main/.github/workflows/continuous_integration.yml#L199-L207
         test_core_args: >-
           --stories tests/test_conversations.yml
-          --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}
 

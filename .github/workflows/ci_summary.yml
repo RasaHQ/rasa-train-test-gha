@@ -39,7 +39,6 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_core_args: >-
           --stories tests/test_conversations.yml
-          --fail-on-prediction-errors
         publish_summary: 'false'
 
     - uses: actions/upload-artifact@v2
@@ -84,7 +83,6 @@ jobs:
         workspace: ${{ github.workspace }}/rasa-demo
         test_core_args: >-
           --stories tests/test_conversations.yml
-          --fail-on-prediction-errors
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/upload-artifact@v2
