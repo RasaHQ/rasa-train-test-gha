@@ -8,15 +8,18 @@ def intent_table():
     writer = MarkdownTableWriter()
     writer.table_name = "Intent Cross-Validation Results"
 
-    with open(f"{result_dir}/intent_report.json", "r") as f:
-        data = json.loads(f.read())
+    try:
+        with open(f"{result_dir}/intent_report.json", "r") as f:
+            data = json.loads(f.read())
+    except FileNotFoundError:
+        print("File not accessible.")
 
     cols = ["support", "f1-score", "confused_with"]
     writer.headers = ["class"] + cols
 
     data.pop("accuracy", None)
     classes = list(data.keys())
-   
+
     classes.sort(key=lambda x: data[x].get("support", 0), reverse=True)
 
     def format_cell(data, c, k):
@@ -39,8 +42,11 @@ def entity_table():
     writer = MarkdownTableWriter()
     writer.table_name = "Entity Cross-Validation Results"
 
-    with open(f"{result_dir}/DIETClassifier_report.json", "r") as f:
-        data = json.loads(f.read())
+    try:
+        with open(f"{result_dir}/DIETClassifier_report.json", "r") as f:
+            data = json.loads(f.read())
+    except FileNotFoundError:
+        print("File not accessible.")
 
     cols = ["support", "f1-score", "precision", "recall"]
     writer.headers = ["entity"] + cols
