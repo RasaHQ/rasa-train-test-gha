@@ -89,6 +89,14 @@ inputs:
     description: 'Directory name where reports are stored in'
     required: false
     default: 'reports'
+  gomplate_image:
+    description: 'Custom gomplate image. Useful if you use custom gomplate image'
+    required: false
+    default: 'hairyhenderson/gomplate'
+  tmpfs_directory:
+    description: 'The directory location where tmpfs mounts'
+    required: false
+    default: '/.config'
 outputs:
   report:
     description: "Return report as JSON"
@@ -153,7 +161,7 @@ runs:
         fi
 
         # Set docker args
-        echo DOCKER_ARGS="--rm --tmpfs /.config -e MPLCONFIGDIR=/tmp/.mplconfigdir \
+        echo DOCKER_ARGS="--rm --tmpfs ${{ inputs.tmpfs_directory }} -e HOME=/app -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
           -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
@@ -266,7 +274,7 @@ runs:
         fi
 
         echo "::set-output name=report::$(docker run --rm -v ${{ github.action_path }}/templates:/templates \
-          -v ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json:/report.json hairyhenderson/gomplate -d report=/report.json \
+          -v ${{ inputs.workspace }}/${{ inputs.report_directory }}/report.json:/report.json ${{ inputs.gomplate_image }} -d report=/report.json \
           -f /templates/report_to_json.tmpl)"
 
         # Convert JSON to CSV
