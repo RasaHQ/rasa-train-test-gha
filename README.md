@@ -30,6 +30,7 @@ jobs:
 | `rasa_train`         | Run `rasa train`                                                              | `true`                    |
 | `rasa_test`          | Run `rasa test`                                                               | `true`                    |
 | `data_validate`      | Validates domain and data files to check for possible mistakes                | `true`                    |
+| `data_validate_args` | Additional arguments passed to the `rasa data validate` command               | `none`                    |
 | `fine_tune`          | Fine-tune an existing model with new training dataset                         | `false`                   |
 | `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
 | `train_type`         | The types of training (available types: `core`/`nlu`/`all`)                   | `all`                     |
