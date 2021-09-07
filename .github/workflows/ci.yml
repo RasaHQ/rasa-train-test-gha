@@ -36,7 +36,6 @@ jobs:
       with:
         rasa_version: ${{ env.RASA_IMAGE_TAG }}
         workspace: ${{ github.workspace }}/rasa-project
-        data_validate_args: --fail-on-warning
         test_type: all
         fine_tune: 'true'
         github_token: ${{ secrets.GITHUB_TOKEN }}
