@@ -25,6 +25,10 @@ inputs:
     description: 'Validates domain and data files to check for possible mistakes'
     required: true
     default: 'true'
+  data_validate_args:
+    description: 'Additional arguments passed to the rasa data validate command'
+    required: false
+    default: ''
   workspace:
     description: 'The root directory'
     required: false
@@ -210,8 +214,8 @@ runs:
         if [[ "${{ inputs.data_validate }}" == "true" ]]; then
           echo "Run data validation"
           echo
-          echo docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate
+          echo docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate ${{ inputs.data_validate_args }}
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} data validate ${{ inputs.data_validate_args }}
         else
           echo "::warning::Data validation is disabled. To turn on data validation set the data_validate parameter to 'true'."
         fi
