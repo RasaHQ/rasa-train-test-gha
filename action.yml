@@ -303,7 +303,10 @@ runs:
           fi
 
           if [[ -f "${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml" ]]; then
-            OUTPUT="${OUTPUT}\n$(cat ${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml)"
+            TEST_FAILED=$(grep 'None of the test stories failed' README.md > /dev/null; echo $?)
+            if [[ $TEST_FAILED -eq 0 ]]; then
+              OUTPUT="${OUTPUT}\n```yml\n$(cat ${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml)```"
+            fi
           fi
 
           OUTPUT="${OUTPUT//$'\n'/'\n'}"
