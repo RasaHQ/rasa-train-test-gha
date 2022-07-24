@@ -19,7 +19,6 @@ def intent_table():
 
     data.pop("accuracy", None)
     classes = list(data.keys())
-    classes.remove("accuracy")
 
     classes.sort(key=lambda x: data[x].get("support", 0), reverse=True)
 
