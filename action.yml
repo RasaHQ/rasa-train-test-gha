@@ -302,6 +302,10 @@ runs:
             OUTPUT="${OUTPUT}\n$(python3 ${{ github.action_path }}/scripts/cross_validation_results.py)"
           fi
 
+          if [[ -f "${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml" ]]; then
+            OUTPUT="${OUTPUT}\n$(cat ${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml)"
+          fi
+
           OUTPUT="${OUTPUT//$'\n'/'\n'}"
 
           curl -X POST -s -H "Authorization: token ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json"  \
