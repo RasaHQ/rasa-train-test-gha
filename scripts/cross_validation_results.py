@@ -51,6 +51,7 @@ def entity_table():
     cols = ["support", "f1-score", "precision", "recall"]
     writer.headers = ["entity"] + cols
 
+    data.pop("accuracy", None)
     classes = list(data.keys())
     classes.sort(key=lambda x: data[x]["support"], reverse=True)
 
