@@ -21,6 +21,10 @@ inputs:
     description: 'Fine-tune model'
     required: false
     default: 'false'
+  fixed_model_name:
+    description: 'Name to be given to the model file'
+    required: false
+    default: ''
   data_validate:
     description: 'Validates domain and data files to check for possible mistakes'
     required: true
@@ -159,6 +163,11 @@ runs:
           echo MODEL_ARGS="--model /app/${{ inputs.model }}" >> $GITHUB_ENV
         fi
 
+        # Set a fixed model name
+        if [[ -n "${{ inputs.fixed_model_name }}" ]];then
+          echo FIXED_MODEL_ARGS="--fixed-model-name ${{ inputs.fixed_model_name }}" >> $GITHUB_ENV
+        fi
+
         # Set cross validation
         if [[ "${{ inputs.cross_validation }}" == "true" ]];then
           echo CROSS_VALIDATION_ARGS="--cross-validation" >> $GITHUB_ENV
@@ -240,7 +249,7 @@ runs:
         elif [[ "${{ inputs.rasa_train }}" == "true" ]]; then
           echo "Run the rasa train"
           echo ""
-          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TRAIN_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ env.FINE_TUNE }} ${{ inputs.train_args }}
+          docker run ${{ env.DOCKER_ARGS }} ${{ env.RASA_IMAGE }} train ${{ env.TRAIN_TYPE }} ${{ env.DEFAULT_ARGS }} ${{ env.FIXED_MODEL_ARGS }} ${{ env.FINE_TUNE }} ${{ inputs.train_args }}
         else
           echo "::warning::rasa train is disabled. To turn on the rasa train set the rasa_train parameter to 'true'."
         fi
