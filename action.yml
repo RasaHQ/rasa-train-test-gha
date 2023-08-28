@@ -302,6 +302,15 @@ runs:
             OUTPUT="${OUTPUT}\n$(python3 ${{ github.action_path }}/scripts/cross_validation_results.py)"
           fi
 
+          if [[ -f "${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml" ]]; then
+            TEST_FAILED=$(grep 'None of the test stories failed' README.md > /dev/null; echo $?)
+            if [[ $TEST_FAILED -eq 0 ]]; then
+              OUTPUT="${OUTPUT}\n```yml\n$(cat ${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml)```"
+            else
+              OUTPUT="${OUTPUT}\n\n#$(cat ${{ inputs.workspace }}/${{ inputs.result_directory }}/failed_test_stories.yml)"
+            fi
+          fi
+
           OUTPUT="${OUTPUT//$'\n'/'\n'}"
 
           curl -X POST -s -H "Authorization: token ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json"  \
