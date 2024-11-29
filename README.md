@@ -40,6 +40,7 @@ jobs:
 | `test_core_args`     | Additional arguments passed to the `rasa test core` command                   | `none`                    |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |
 | `github_token`       | GitHub Token - required to add a comment with summary                         | `none`                    |
+| `rasa_pro_license`   | Rasa Pro License - set RASA_PRO_LICENSE environment from secrets              | `none`                    |
 | `configuration`      | Model configuration file                                                      | `config.yml`              |
 | `model`              | Path to a file with a model. Use existing model instead of training a new one | `none`                    |
 | `cross_validation`   | Switch on cross validation mode. Any provided model will be ignored           | `false`                   |
@@ -81,6 +82,7 @@ jobs:
                 # In order to add a PR comment with summary
                 # a GH Token has to be pass to the GH action
                 github_token: ${{ secrets.GITHUB_TOKEN }}
+                rasa_pro_license: ${{ secrets.RASA_PRO_LICENSE }}
             # ...
 ```
 

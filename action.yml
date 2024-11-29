@@ -61,6 +61,10 @@ inputs:
     description: 'GitHub Token - required to add a comment with summary'
     required: false
     default: ''
+  rasa_pro_license:
+    description: 'Rasa Pro License - set RASA_PRO_LICENSE environment'
+    required: false
+    default: ''
   configuration:
     description: 'Model configuration file'
     required: true
@@ -167,6 +171,7 @@ runs:
         # Set docker args
         echo DOCKER_ARGS="--rm --tmpfs ${{ inputs.tmpfs_directory }} -e HOME=/app -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
+          -e RASA_PRO_LICENSE=${{ secrets.RASA_PRO_LICENSE }} \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
           -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
 
