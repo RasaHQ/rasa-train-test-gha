@@ -35,12 +35,13 @@ jobs:
 | `workspace`          | The root directory containing your Rasa Open Source project                   | `${{ github.workspace }}` |
 | `train_type`         | The types of training (available types: `core`/`nlu`/`all`)                   | `all`                     |
 | `train_args`         | Additional arguments passed to the `rasa train` command                       | `none`                    |
-| `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`)               | `all`                     |
+| `test_type`          | The types of tests to run (available types: `core`/`nlu`/`all`/`none`)        | `all`                     |
 | `test_nlu_args`      | Additional arguments passed to the `rasa test nlu` command                    | `none`                    |
 | `test_core_args`     | Additional arguments passed to the `rasa test core` command                   | `none`                    |
 | `publish_summary`    | Publish tests summary as a PR comment                                         | `true`                    |
 | `github_token`       | GitHub Token - required to add a comment with summary                         | `none`                    |
 | `rasa_pro_license`   | Rasa Pro License - set RASA_PRO_LICENSE environment from secrets              | `none`                    |
+| `openai_api_key`     | OpenAI API Key - set OPENAI_API_KEY environment from secrets                  | `none`                    |
 | `configuration`      | Model configuration file                                                      | `config.yml`              |
 | `model`              | Path to a file with a model. Use existing model instead of training a new one | `none`                    |
 | `cross_validation`   | Switch on cross validation mode. Any provided model will be ignored           | `false`                   |
