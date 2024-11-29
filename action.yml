@@ -158,7 +158,7 @@ runs:
             echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
           none)
-            echo "No tests will be run"
+            echo "::warning::No tests will be run"
             ;;
           *)
             echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
