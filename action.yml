@@ -118,9 +118,9 @@ runs:
   using: "composite"
   steps:
     - name: Set environment
-      shell: bash
       env:
         RASA_PRO_LICENSE: ${{ secrets.RASA_PRO_LICENSE }}
+      shell: bash
       run: |-
         mkdir -p ${{ inputs.workspace }}/models
         chmod 777 ${{ inputs.workspace }}/models
@@ -173,7 +173,7 @@ runs:
         # Set docker args
         echo DOCKER_ARGS="--rm --tmpfs ${{ inputs.tmpfs_directory }} -e HOME=/app -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
-          -e RASA_PRO_LICENSE=${{ env.RASA_PRO_LICENSE }} \
+          -e RASA_PRO_LICENSE=${RASA_PRO_LICENSE} \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
           -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
 
