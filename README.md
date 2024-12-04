@@ -255,7 +255,7 @@ jobs:
 
             # The 'actions/upload-artifact' action to upload files
             # More: https://github.com/actions/upload-artifact
-            - uses: actions/upload-artifact@v2
+            - uses: actions/upload-artifact@v4
               with:
                 name: rasa-demo-cfg
                 path: |

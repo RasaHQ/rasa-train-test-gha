@@ -13,10 +13,10 @@ jobs:
     name: Test GH action - Rasa Demo - cfg 1
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Checkout Rasa Demo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: RasaHQ/rasa-demo
         path: rasa-demo
@@ -41,7 +41,7 @@ jobs:
           --stories tests/test_conversations.yml
         publish_summary: 'false'
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: rasa-demo-cfg-1
         path: rasa-demo/reports
@@ -52,15 +52,15 @@ jobs:
     needs: [test_action_1]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Checkout Rasa Demo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: RasaHQ/rasa-demo
         path: rasa-demo
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: rasa-demo-cfg-1
         path: rasa-demo/reports
@@ -85,7 +85,7 @@ jobs:
           --stories tests/test_conversations.yml
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: rasa-demo-cfg-2
         path: |
