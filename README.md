@@ -14,7 +14,7 @@ jobs:
     steps:
       # Checks-out GitHub repository
       # more: https://github.com/actions/checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # Run rasa train and rasa test
       - name: My first step

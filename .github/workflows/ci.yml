@@ -17,7 +17,7 @@ jobs:
     name: Test GH action - rasa init
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Create a new project
       run: |
@@ -59,10 +59,10 @@ jobs:
     name: Test GH action - Rasa X Demo
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Checkout Rasa X Demo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: RasaHQ/rasa-x-demo
         path: rasa-x-demo
@@ -107,10 +107,10 @@ jobs:
     needs: [test_action_x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Checkout Rasa Demo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: RasaHQ/rasa-demo
         path: rasa-demo
@@ -147,10 +147,10 @@ jobs:
     name: Test GH action - Rasa Demo - ALL
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Checkout Rasa Demo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: RasaHQ/rasa-demo
         path: rasa-demo
