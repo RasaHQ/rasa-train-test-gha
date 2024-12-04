@@ -61,6 +61,14 @@ inputs:
     description: 'GitHub Token - required to add a comment with summary'
     required: false
     default: ''
+  rasa_pro_license:
+    description: 'Rasa Pro License - set RASA_PRO_LICENSE environment'
+    required: false
+    default: ''
+  openai_api_key:
+    description: 'OPENAI_API_KEY'
+    required: false
+    default: ''
   configuration:
     description: 'Model configuration file'
     required: true
@@ -149,6 +157,9 @@ runs:
           core)
             echo TEST_CORE="true" >> $GITHUB_ENV
             ;;
+          none)
+            echo "::warning::No tests will be run"
+            ;;
           *)
             echo "::error::Unknown test type: ${{ inputs.test_type }} (use: core/nlu/all)"
             exit 1
@@ -167,6 +178,8 @@ runs:
         # Set docker args
         echo DOCKER_ARGS="--rm --tmpfs ${{ inputs.tmpfs_directory }} -e HOME=/app -e MPLCONFIGDIR=/tmp/.mplconfigdir \
           -e CI=${CI} -e RASA_TELEMETRY_ENABLED=${{ env.RASA_TELEMETRY_ENABLED }} -v ${{ github.workspace }}:/app/github_workspace \
+          -e RASA_PRO_LICENSE=${{ inputs.RASA_PRO_LICENSE }} \
+          -e OPENAI_API_KEY=${{ inputs.OPENAI_API_KEY }} \
           -v ${{ inputs.workspace }}:/app -v ${{ inputs.workspace }}/models:/app/models \
           -v ${{ inputs.workspace }}/${{ inputs.result_directory }}:/app/results" >> $GITHUB_ENV
 
